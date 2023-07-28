@@ -2,6 +2,7 @@
 using System.Linq;
 using _3DModels.Models;
 using Microsoft.EntityFrameworkCore;
+using OpenQA.Selenium;
 
 namespace _3DModels.Services
 {

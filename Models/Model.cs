@@ -1,24 +1,36 @@
-﻿using Microsoft.CodeAnalysis.Completion;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+
+using _3DModels.Models;
+
+using _3DModels.Repository;
+
+
 
 namespace _3DModels.Models
 {
+
     public class Model
+
     {
+
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ModelId { get; set; }
 
-        [Required]
-        public string ModelName { get; set; }
+        public int Id { get; set; }
 
-        [Required]
-        public string Description { get; set; }
+        public string Title { get; set; } = string.Empty;
 
-        [Required]
-        public decimal Price{get; set;}
+        public string Description { get; set; } = string.Empty;
+
+        public ModelAccessories ModelAccesoriess { get; set; } = new ModelAccessories();
+
+        public decimal Price { get; set; }
+
+        public int Quantity { get; set; }
+
+        public string ImageName { get; set; } = string.Empty;
+
+
+
     }
+
 }

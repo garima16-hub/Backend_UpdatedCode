@@ -5,39 +5,22 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace _3DModels.Migrations
 {
-    public partial class initial : Migration
+    public partial class @new : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "model",
-                columns: table => new
-                {
-                    ModelId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ModelName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_model", x => x.ModelId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ModelAccessories",
                 columns: table => new
                 {
-                    Accessories_id = table.Column<int>(type: "int", nullable: false)
+                    id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ModelId = table.Column<int>(type: "int", nullable: false),
-                    Filepath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Accessories_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SubCategory = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ModelAccessories", x => x.Accessories_id);
+                    table.PrimaryKey("PK_ModelAccessories", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -106,27 +89,14 @@ namespace _3DModels.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductCategory",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SubCategory = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductCategory", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ThreeDModels",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ModelName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumberOfVertices = table.Column<int>(type: "int", nullable: false)
+                    NumberOfVertices = table.Column<int>(type: "int", nullable: false),
+                    IsValid = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -144,7 +114,8 @@ namespace _3DModels.Migrations
                     pass = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phonenumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Phonenumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -152,43 +123,37 @@ namespace _3DModels.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
+                name: "Models",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProductCategoryid = table.Column<int>(type: "int", nullable: false),
+                    ModelAccesoriessid = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     ImageName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_Models", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_ProductCategory_ProductCategoryid",
-                        column: x => x.ProductCategoryid,
-                        principalTable: "ProductCategory",
+                        name: "FK_Models_ModelAccessories_ModelAccesoriessid",
+                        column: x => x.ModelAccesoriessid,
+                        principalTable: "ModelAccessories",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_ProductCategoryid",
-                table: "Products",
-                column: "ProductCategoryid");
+                name: "IX_Models_ModelAccesoriessid",
+                table: "Models",
+                column: "ModelAccesoriessid");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "model");
-
-            migrationBuilder.DropTable(
-                name: "ModelAccessories");
-
             migrationBuilder.DropTable(
                 name: "ModelCoordinators");
 
@@ -196,10 +161,10 @@ namespace _3DModels.Migrations
                 name: "ModelDesigners");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Models");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "ThreeDModels");
@@ -208,7 +173,7 @@ namespace _3DModels.Migrations
                 name: "users");
 
             migrationBuilder.DropTable(
-                name: "ProductCategory");
+                name: "ModelAccessories");
         }
     }
 }

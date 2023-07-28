@@ -1,82 +1,75 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using _3DModels.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Http;
+
+using _3DModels.Repository;
+using _3DModels.Repositories;
+
+
+
+
 
 namespace _3DModels.Controllers
+
 {
-    [ApiController]
+
     [Route("api/[controller]")]
-    public class ModelController : ControllerBase
+
+    [ApiController]
+
+
+
+    public class ModelController : Controller
+
     {
-        private readonly ModelDbContext _context;
 
-        public ModelController(ModelDbContext context)
+        // .....declaring the fields......
+
+        readonly IModel model;
+
+        private readonly string DateFormat;
+
+        public ModelController(IModel model, IConfiguration configuration)
+
         {
-            _context = context;
+
+            this.model = model;
+
+            DateFormat = configuration["Constants:DateFormat"];
+
+        }
+        // <....loading products by category , subcategory.......>
+
+        [HttpGet("GetModels")]
+
+        public IActionResult GetProducts(string category, string subcategory, int count)
+
+        {
+
+            var result = model.GetModels(category, subcategory, count);
+
+            return Ok(result);
+
+
+
         }
 
-        // GET: api/Model
-        [HttpGet]
-        public ActionResult<IEnumerable<Model>> GetModels()
+        // <..............Get the products by their id............>
+
+        [HttpGet("GetModel/{id}")]
+
+        public IActionResult GetProduct(int id)
+
         {
-            return _context.model.ToList();
+
+            var result = model.GetModel(id);
+
+            return Ok(result);
+
         }
 
-        // GET: api/Model/5
-        [HttpGet("{id}")]
-        public ActionResult<Model> GetModel(int id)
-        {
-            var model = _context.model.Find(id);
 
-            if (model == null)
-            {
-                return NotFound();
-            }
 
-            return model;
-        }
 
-        // POST: api/Model
-        [HttpPost]
-        public ActionResult<Model> PostModel(Model model)
-        {
-            _context.model.Add(model);
-            _context.SaveChanges();
-
-            return CreatedAtAction("GetModel", new { id = model.ModelId }, model);
-        }
-
-        // PUT: api/Model/5
-        [HttpPut("{id}")]
-        public IActionResult PutModel(int id, Model model)
-        {
-            if (id != model.ModelId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(model).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return NoContent();
-        }
-
-        // DELETE: api/Model/5
-        [HttpDelete("{id}")]
-        public ActionResult<Model> DeleteModel(int id)
-        {
-            var model = _context.model.Find(id);
-            if (model == null)
-            {
-                return NotFound();
-            }
-
-            _context.model.Remove(model);
-            _context.SaveChanges();
-
-            return model;
-        }
     }
 }

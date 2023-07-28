@@ -72,14 +72,15 @@ namespace _3DModels
             // Add repository and service dependencies
             services.AddScoped<OrdersRepository>();
             services.AddScoped<OrdersService>();
-            services.AddScoped<ModelAccessoriesRepository>();
-            services.AddScoped<ModelAccessoriesService>();
+            
+           // services.AddScoped<ModelAccessoriesService>();
             //services.AddScoped<UsersRepository>();
             //services.AddScoped<UsersService>();
             services.AddScoped<LoginController>();
             services.AddScoped<ModelRepository>();
-            services.AddScoped<IDataAccess, DataAccess>();
-            services.AddScoped<ModelService>();
+            services.AddScoped<IModel, ModelRepository>();
+            services.AddScoped<IModelAccessories, ModelAccessoriesRepository>();
+            //services.AddScoped<ModelService>();
             services.AddScoped<ModelCoordinatorRepository>();
             services.AddScoped<ModelCoordinatorService>();
             services.AddScoped<ModelDesignerService>();

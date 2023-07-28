@@ -12,7 +12,7 @@ using _3DModels.Models;
 namespace _3DModels.Migrations
 {
     [DbContext(typeof(ModelDbContext))]
-    [Migration("20230727120738_new")]
+    [Migration("20230728105517_new")]
     partial class @new
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,53 +26,38 @@ namespace _3DModels.Migrations
 
             modelBuilder.Entity("_3DModels.Models.Model", b =>
                 {
-                    b.Property<int>("ModelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModelId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ModelName")
+                    b.Property<string>("ImageName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("ModelId");
-
-                    b.ToTable("model");
-                });
-
-            modelBuilder.Entity("_3DModels.Models.ModelAccessories", b =>
-                {
-                    b.Property<int>("Accessories_id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Accessories_id"), 1L, 1);
-
-                    b.Property<string>("Accessories_name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Filepath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ModelId")
+                    b.Property<int>("ModelAccesoriessid")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Accessories_id");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
-                    b.ToTable("ModelAccessories");
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModelAccesoriessid");
+
+                    b.ToTable("Models");
                 });
 
             modelBuilder.Entity("_3DModels.Models.ModelCoordinator", b =>
@@ -217,63 +202,6 @@ namespace _3DModels.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("_3DModels.Models.Product", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductCategoryid")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductCategoryid");
-
-                    b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("_3DModels.Models.ProductCategory", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SubCategory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("ProductCategory");
-                });
-
             modelBuilder.Entity("_3DModels.Models.ThreeDModel", b =>
                 {
                     b.Property<int>("ID")
@@ -325,6 +253,10 @@ namespace _3DModels.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -334,15 +266,36 @@ namespace _3DModels.Migrations
                     b.ToTable("users");
                 });
 
-            modelBuilder.Entity("_3DModels.Models.Product", b =>
+            modelBuilder.Entity("_3DModels.Repository.ModelAccessories", b =>
                 {
-                    b.HasOne("_3DModels.Models.ProductCategory", "ProductCategory")
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubCategory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("ModelAccessories");
+                });
+
+            modelBuilder.Entity("_3DModels.Models.Model", b =>
+                {
+                    b.HasOne("_3DModels.Repository.ModelAccessories", "ModelAccesoriess")
                         .WithMany()
-                        .HasForeignKey("ProductCategoryid")
+                        .HasForeignKey("ModelAccesoriessid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ProductCategory");
+                    b.Navigation("ModelAccesoriess");
                 });
 #pragma warning restore 612, 618
         }

@@ -22,11 +22,11 @@ namespace _3DModels.Models
 
 
         public virtual DbSet<Orders> Orders { get; set; } = null!;
-        public virtual DbSet<ModelAccessories> ModelAccessories { get; set; } = null!;
+        public virtual DbSet<Model> Models{ get; set; } = null!;
         public virtual DbSet<Users> users { get; set; } = null!;
-        public virtual DbSet<Model> model { get; set; }
+        
 
-        public DbSet<Product> Products { get; set; }
+        
         public  DbSet<ModelCoordinator> ModelCoordinators { get; set; }
 
 
