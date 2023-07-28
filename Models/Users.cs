@@ -19,6 +19,8 @@ namespace _3DModels.Models
         public string Gender { get; set; } = null!;
         public string Phonenumber { get; set; }
 
+        public string role { get; set; } = null!;
+
 
     }
 }
