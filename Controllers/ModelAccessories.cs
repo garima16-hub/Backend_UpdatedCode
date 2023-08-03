@@ -5,10 +5,6 @@ using Microsoft.AspNetCore.Http;
 using _3DModels.Repository;
 using _3DModels.Repositories;
 
-
-
-
-
 namespace _3DModels.Controllers
 
 {
@@ -51,5 +47,8 @@ namespace _3DModels.Controllers
 
         }
 
+
+
     }
 }
+

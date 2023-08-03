@@ -1,15 +1,20 @@
-﻿using BCrypt.Net;
+﻿using System.Security.Cryptography;
+using System.Text;
 
 public class PasswordHashingService
 {
     public string HashPassword(string password)
     {
-        string salt = BCrypt.Net.BCrypt.GenerateSalt();
-        return BCrypt.Net.BCrypt.HashPassword(password, salt);
+        using (var sha256 = SHA256.Create())
+        {
+            byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hashedBytes);
+        }
     }
 
     public bool VerifyPassword(string password, string hashedPassword)
     {
-        return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        string hashedInput = HashPassword(password);
+        return hashedInput == hashedPassword;
     }
 }

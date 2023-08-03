@@ -13,7 +13,7 @@ public class UserRegistrationService
         _passwordHashingService = passwordHashingService;
     }
 
-    public void RegisterUser(string username, string pass, string email, string city, string gender, string phoneNumber)
+    public void RegisterUser(string username, string pass, string email, string city, string gender, string phoneNumber, string role)
     {
         // Hash the password
         string hashedPassword = _passwordHashingService.HashPassword(pass);
@@ -26,7 +26,8 @@ public class UserRegistrationService
             Email = email,
             City = city,
             Gender = gender,
-            Phonenumber = phoneNumber
+            Phonenumber = phoneNumber,
+            Role= role
         };
 
         // Store the new user in the database

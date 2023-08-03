@@ -37,7 +37,7 @@ namespace _3DModels.Repository
 
             this.configuration = configuration;
 
-            dbconnection = this.configuration["ConnectionStrings:Configuration"];
+           dbconnection = this.configuration["ConnectionStrings:dbconn"];
 
             dateformat = this.configuration["Contants:DateFormat"];
 
@@ -122,7 +122,7 @@ namespace _3DModels.Repository
 
                 };
 
-                string query = "SELECT * FROM ModelAccesories WHERE id = " + id + ";";
+                string query = "SELECT * FROM ModelAccessories WHERE id = " + id + ";";
 
                 command.CommandText = query;
 
@@ -151,7 +151,7 @@ namespace _3DModels.Repository
 
 
         // Get the Model by their category,subcategory and count 
-        public List<Model> GetModels(string category, string subcategory, int count)
+            public List<Model> GetModels(string category, string subcategory, int count)
 
         {
 
@@ -169,7 +169,7 @@ namespace _3DModels.Repository
 
                 };
 
-                string query = "SELECT TOP " + count + " * FROM Models WHERE ModelAccesoriessid=(SELECT id FROM ModelAccesories WHERE Category=@c AND SubCategory=@s) ORDER BY newid();";
+                string query = "SELECT TOP " + count + " * FROM Models WHERE ModelAccesoriessid=(SELECT id FROM ModelAccessories WHERE Category=@c AND SubCategory=@s) ORDER BY newid();";
 
                 command.CommandText = query;
 
@@ -205,7 +205,7 @@ namespace _3DModels.Repository
 
                     var categoryid = (int)reader["ModelAccesoriessid"];
 
-                    product.ModelAccesoriess = GetModelAccessory(categoryid);
+                    product.ModelAccesoriess= GetModelAccessory(categoryid);
 
                     products.Add(product);
 

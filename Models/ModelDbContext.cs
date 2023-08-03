@@ -33,6 +33,8 @@ namespace _3DModels.Models
         public DbSet<ModelDesigner> ModelDesigners { get; set; }
         public DbSet<ThreeDModel> ThreeDModels { get; set; }
 
+        public DbSet<InventoryItem> InventoryItems { get; set; }
+
 
     }
 

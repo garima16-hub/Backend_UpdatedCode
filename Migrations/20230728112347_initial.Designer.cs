@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _3DModels.Models;
 
@@ -11,9 +12,10 @@ using _3DModels.Models;
 namespace _3DModels.Migrations
 {
     [DbContext(typeof(ModelDbContext))]
-    partial class ModelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230728112347_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,27 +23,6 @@ namespace _3DModels.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("_3DModels.Models.InventoryItem", b =>
-                {
-                    b.Property<int>("InventoryItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InventoryItemId"), 1L, 1);
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("InventoryItemId");
-
-                    b.ToTable("InventoryItems");
-                });
 
             modelBuilder.Entity("_3DModels.Models.Model", b =>
                 {
@@ -59,9 +40,6 @@ namespace _3DModels.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InventoryItemId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ModelAccesoriessid")
                         .HasColumnType("int");
 
@@ -76,8 +54,6 @@ namespace _3DModels.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InventoryItemId");
 
                     b.HasIndex("ModelAccesoriessid");
 
@@ -313,26 +289,13 @@ namespace _3DModels.Migrations
 
             modelBuilder.Entity("_3DModels.Models.Model", b =>
                 {
-                    b.HasOne("_3DModels.Models.InventoryItem", "InventoryItem")
-                        .WithMany("Models")
-                        .HasForeignKey("InventoryItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("_3DModels.Repository.ModelAccessories", "ModelAccesoriess")
                         .WithMany()
                         .HasForeignKey("ModelAccesoriessid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("InventoryItem");
-
                     b.Navigation("ModelAccesoriess");
-                });
-
-            modelBuilder.Entity("_3DModels.Models.InventoryItem", b =>
-                {
-                    b.Navigation("Models");
                 });
 #pragma warning restore 612, 618
         }

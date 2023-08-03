@@ -38,7 +38,7 @@ namespace _3DModels.Controllers
             return user;
         }
 
-       
+
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
@@ -57,4 +57,3 @@ namespace _3DModels.Controllers
         }
     }
 }
-

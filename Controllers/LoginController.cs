@@ -10,8 +10,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using NuGet.Protocol.Plugins;
-using _3DModels.Services;
 
 namespace _3DModels.Controllers
 {
@@ -42,7 +40,7 @@ namespace _3DModels.Controllers
 
                 if (currentUser != null)
                 {
-                    var token = GenerateToken(currentUser.emailId);
+                    var token = GenerateToken(currentUser.emailId, "Administrator");
                     var response = new { Message = "Login successful", Token = token };
                     return Ok(response);
                 }
@@ -56,7 +54,7 @@ namespace _3DModels.Controllers
 
                 if (buyer != null)
                 {
-                    var token = GenerateToken(buyer.Email);
+                    var token = GenerateToken(buyer.Email, "Buyer");
                     var response = new { Message = "Login successful", Token = token };
                     return Ok(response);
                 }
@@ -65,21 +63,16 @@ namespace _3DModels.Controllers
             return BadRequest("User Not Found");
         }
 
-        // ... Existing code for token generation and key generation ...
-
-    
-
-
-
-       private string GenerateToken(string userEmail)
+        private string GenerateToken(string userEmail, string userRole)
         {
-            var jwtSecret = GenerateJwtSecretKey();
+            var jwtSecret = _configuration["ApplicationSettings:JWT_Secret"];
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("Email", userEmail)
+                    new Claim("Email", userEmail),
+                    new Claim(ClaimTypes.Role, userRole)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(5),
                 SigningCredentials = new SigningCredentials(
@@ -92,18 +85,5 @@ namespace _3DModels.Controllers
             var token = tokenHandler.WriteToken(securityToken);
             return token;
         }
-
-        private string GenerateJwtSecretKey()
-        {
-            var randomBytes = new byte[32]; // 256 bits
-            using (var rng = new RNGCryptoServiceProvider())
-            {
-                rng.GetBytes(randomBytes);
-            }
-            return Convert.ToBase64String(randomBytes);
-        }
     }
 }
-
-
-

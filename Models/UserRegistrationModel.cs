@@ -9,6 +9,8 @@
         public string Gender { get; set; }
         public string Phonenumber { get; set; }
 
+        public string Role { get; set; } // Add the Role property here
+
     }
 }
 

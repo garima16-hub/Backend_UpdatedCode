@@ -25,7 +25,7 @@ public class UserRegistrationController : ControllerBase
         }
 
         // Call the UserRegistrationService to register the new user
-        _userRegistrationService.RegisterUser(model.Username, model.Pass, model.Email, model.City, model.Gender, model.Phonenumber);
+        _userRegistrationService.RegisterUser(model.Username, model.Pass, model.Email, model.City, model.Gender, model.Phonenumber, model.Role);
 
         // Redirect to a success page or return a success message
         return Ok("User registration successful!");
@@ -83,9 +83,3 @@ public class UserRegistrationController : ControllerBase
         return user;
     }
 }
-
-
-
-
-
-

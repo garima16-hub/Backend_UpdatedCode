@@ -29,6 +29,9 @@ namespace _3DModels.Controllers
 
         private readonly string DateFormat;
 
+        private readonly IModel _model;
+        private readonly IInventoryRepository _inventoryRepository;
+
         public ModelController(IModel model, IConfiguration configuration)
 
         {

@@ -7,6 +7,6 @@ namespace _3DModels.Repository
     {
         List<ModelAccessories> GetModelAccessories();
 
-        ModelAccessories GetModelAccessory(int id);
+        
     }
 }

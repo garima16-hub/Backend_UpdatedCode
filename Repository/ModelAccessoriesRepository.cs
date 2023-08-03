@@ -35,57 +35,15 @@ namespace _3DModels.Repository
 
             this.configuration = configuration;
 
-            dbconnection = this.configuration["ConnectionStrings:Configuration"];
+            dbconnection = this.configuration["ConnectionStrings:dbconn"];
 
             dateformat = this.configuration["Contants:DateFormat"];
 
         }
 
-        // <..............Get the ModelAccessories by their id............>          
+                
 
-        public ModelAccessories GetModelAccessory(int id)
-
-        {
-
-            var productcategory = new ModelAccessories();
-
-            using (SqlConnection connection = new(dbconnection))
-
-            {
-
-                SqlCommand command = new()
-
-                {
-
-                    Connection = connection
-
-                };
-
-                string query = "SELECT * FROM ModelAccesories WHERE id = " + id + ";";
-
-                command.CommandText = query;
-
-                connection.Open();
-
-                SqlDataReader r = command.ExecuteReader();
-
-                while (r.Read())
-
-                {
-
-                    productcategory.id = (int)r["id"];
-
-                    productcategory.Category = (string)r["Category"];
-
-                    productcategory.SubCategory = (string)r["SubCategory"];
-
-                }
-
-            }
-
-            return productcategory;
-
-        }
+       
         public List<ModelAccessories> GetModelAccessories()
 
         {
@@ -104,7 +62,7 @@ namespace _3DModels.Repository
 
                 };
 
-                string query = "SELECT * FROM ModelAccesories;";
+                string query = "SELECT * FROM ModelAccessories;";
 
                 command.CommandText = query;
 

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 using _3DModels.Models;
 
 using _3DModels.Repository;
@@ -17,9 +17,9 @@ namespace _3DModels.Models
 
         public int Id { get; set; }
 
-        public string Title { get; set; } = string.Empty;
+        public string Title { get; set; } 
 
-        public string Description { get; set; } = string.Empty;
+        public string Description { get; set; } 
 
         public ModelAccessories ModelAccesoriess { get; set; } = new ModelAccessories();
 
@@ -27,7 +27,15 @@ namespace _3DModels.Models
 
         public int Quantity { get; set; }
 
-        public string ImageName { get; set; } = string.Empty;
+        public string ImageName { get; set; }
+
+        // Add a foreign key to reference the InventoryItem
+
+        [ForeignKey(nameof(InventoryItemId))]
+        public int InventoryItemId { get; set; }
+
+        
+        public InventoryItem InventoryItem { get; set; }
 
 
 
