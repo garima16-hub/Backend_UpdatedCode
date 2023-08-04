@@ -39,7 +39,7 @@ namespace _3DModels.Models
             }
 
             // If the number of vertices is within the limit, accept the model
-            IsValid = true; // Set IsValid to true if the model is valid
+            //IsValid = true; // Set IsValid to true if the model is valid
             return true;
         }
     }

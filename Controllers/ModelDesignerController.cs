@@ -1,7 +1,9 @@
 ﻿using _3DModels.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace _3DModels.Controllers
 {
@@ -9,44 +11,45 @@ namespace _3DModels.Controllers
     [Route("api/[controller]")]
     public class ModelDesignerController : ControllerBase
     {
-        private List<ModelDesigner> modelDesigners;
         private readonly ModelDbContext _context;
 
-
-
-        public ModelDesignerController()
-        {
-            modelDesigners = new List<ModelDesigner>();
-        }
         public ModelDesignerController(ModelDbContext context)
         {
             _context = context;
         }
 
         [HttpPost]
-        public void AddModelDesigner(ModelDesigner modelDesigner)
+        public IActionResult AddModelDesigner(ModelDesigner modelDesigner)
         {
             // You may consider generating a unique Id for the modelDesigner here.
-            modelDesigners.Add(modelDesigner);
+            _context.ModelDesigners.Add(modelDesigner);
+            _context.SaveChanges();
             Console.WriteLine("Model Designer added successfully.");
+            return Ok();
         }
 
         [HttpGet("{id}")]
-        public ModelDesigner GetModelDesignerById(int id)
+        public IActionResult GetModelDesignerById(int id)
         {
-            return modelDesigners.Find(d => d.Id == id);
+            var modelDesigner = _context.ModelDesigners.FirstOrDefault(d => d.Id == id);
+            if (modelDesigner == null)
+            {
+                return NotFound();
+            }
+            return Ok(modelDesigner);
         }
 
         [HttpGet]
-        public List<ModelDesigner> GetAllModelDesigners()
+        public IActionResult GetAllModelDesigners()
         {
-            return modelDesigners;
+            var modelDesigners = _context.ModelDesigners.ToList();
+            return Ok(modelDesigners);
         }
 
         [HttpPut]
-        public void UpdateModelDesigner(ModelDesigner updatedModelDesigner)
+        public IActionResult UpdateModelDesigner(ModelDesigner updatedModelDesigner)
         {
-            ModelDesigner modelDesignerToUpdate = modelDesigners.Find(d => d.Id == updatedModelDesigner.Id);
+            var modelDesignerToUpdate = _context.ModelDesigners.FirstOrDefault(d => d.Id == updatedModelDesigner.Id);
             if (modelDesignerToUpdate != null)
             {
                 modelDesignerToUpdate.Name = updatedModelDesigner.Name;
@@ -54,15 +57,26 @@ namespace _3DModels.Controllers
                 modelDesignerToUpdate.IsActive = updatedModelDesigner.IsActive;
                 modelDesignerToUpdate.DateModified = DateTime.Now;
                 modelDesignerToUpdate.LastModifiedBy = updatedModelDesigner.LastModifiedBy;
+
+                _context.SaveChanges();
+                Console.WriteLine("Model Designer updated successfully.");
+                return Ok();
             }
-            Console.WriteLine("Model Designer updated successfully.");
+            return NotFound();
         }
 
         [HttpDelete("{id}")]
-        public void DeleteModelDesigner(int id)
+        public IActionResult DeleteModelDesigner(int id)
         {
-            modelDesigners.RemoveAll(d => d.Id == id);
-            Console.WriteLine("Model Designer deleted successfully.");
+            var modelDesigner = _context.ModelDesigners.FirstOrDefault(d => d.Id == id);
+            if (modelDesigner != null)
+            {
+                _context.ModelDesigners.Remove(modelDesigner);
+                _context.SaveChanges();
+                Console.WriteLine("Model Designer deleted successfully.");
+                return Ok();
+            }
+            return NotFound();
         }
     }
 }

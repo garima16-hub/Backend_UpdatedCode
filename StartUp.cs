@@ -87,7 +87,7 @@ namespace _3DModels
             // Register the AuthService with a singleton lifetime (if it's not expected to have per-request state)
             var jwtSecret = Configuration["ApplicationSettings:JWT_Secret"].ToString();
             var key = Encoding.UTF8.GetBytes(jwtSecret);
-            services.AddSingleton<AuthService>(_ => new AuthService(jwtSecret));
+           // services.AddSingleton<AuthService>(_ => new AuthService(jwtSecret));
 
             // JWT Authentication
             services.AddAuthentication(x =>

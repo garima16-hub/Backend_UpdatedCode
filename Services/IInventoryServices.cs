@@ -5,9 +5,11 @@ namespace _3DModels.Services
 {
     public interface IInventoryService
     {
-        // Existing methods...
+        
 
         void AddModel(int inventoryItemId, ModelDTO modelDto);
-        // Add other methods as needed
+  
+
+
     }
 }

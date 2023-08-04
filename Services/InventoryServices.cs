@@ -12,7 +12,8 @@ namespace _3DModels.Services
         private readonly ModelDbContext _dbContext;
         private readonly IInventoryRepository _repository;
         private readonly IMapper _mapper;
-        private readonly ILogger<InventoryService> _logger; 
+        private readonly ILogger<InventoryService> _logger;
+            
 
         public InventoryService(ModelDbContext dbContext, IInventoryRepository repository, IMapper mapper, ILogger<InventoryService> logger)
         {
@@ -22,7 +23,7 @@ namespace _3DModels.Services
             _logger = logger;
         }
 
-      
+
 
         public void AddModel(int InventoryItemId, ModelDTO modelDto)
         {
@@ -38,8 +39,11 @@ namespace _3DModels.Services
                 _logger.LogError(ex, "An error occurred while saving changes to the database.");
                 throw;
             }
-
-           
         }
+
+
+       
     }
 }
+    
+
