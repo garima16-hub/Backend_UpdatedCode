@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Metadata;
 using _3DModels.Repositories;
 using _3DModels.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace _3DModels.Repository
 
@@ -31,16 +32,24 @@ namespace _3DModels.Repository
 
         private readonly string dateformat;
 
-        public ModelRepository(IConfiguration configuration)
+        private readonly ModelDbContext _dbContext;
+
+        public ModelRepository(IConfiguration configuration, ModelDbContext dbContext)
 
         {
 
             this.configuration = configuration;
 
-           dbconnection = this.configuration["ConnectionStrings:dbconn"];
+            dbconnection = this.configuration["ConnectionStrings:dbconn"];
 
             dateformat = this.configuration["Contants:DateFormat"];
 
+            _dbContext = dbContext;
+        }
+
+        public List<Model> GetAllModels()
+        {
+            return _dbContext.Models.ToList();
         }
 
         //Get the Models by their id

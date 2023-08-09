@@ -18,6 +18,7 @@ using AutoMapper;
 using _3DModels.Controllers;
 using _3DModels.Repositories;
 using Microsoft.Extensions.Logging;
+using System.Configuration;
 
 
 namespace _3DModels
@@ -48,6 +49,13 @@ namespace _3DModels
             // Configure the database context
             services.AddDbContext<ModelDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("dbconn")));
+
+
+
+
+
+
+
 
             // Configure CORS
             services.AddCors(options =>
@@ -81,40 +89,63 @@ namespace _3DModels
             services.AddScoped<IInventoryRepository, InventoryRepository>();
             services.AddScoped<IInventoryService, InventoryService>();
 
+
             services.AddScoped<UserRegistrationService>();
             services.AddScoped<PasswordHashingService>();
 
             // Register the AuthService with a singleton lifetime (if it's not expected to have per-request state)
-            var jwtSecret = Configuration["ApplicationSettings:JWT_Secret"].ToString();
-            var key = Encoding.UTF8.GetBytes(jwtSecret);
-           // services.AddSingleton<AuthService>(_ => new AuthService(jwtSecret));
+            // var jwtSecret = Configuration["ApplicationSettings:JWT_Secret"].ToString();
+            //var key = Encoding.UTF8.GetBytes(jwtSecret);
+            // services.AddSingleton<AuthService>(_ => new AuthService(jwtSecret));
 
-            // JWT Authentication
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+            // Configure JWT authentication
+            var jwtSecret = Configuration["Jwt:Key"];
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.FromMinutes(5) // Add a small clock skew to account for slight time differences
-                };
-            });
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = key
+                    };
+                });
+            // Configure JWT authentication for Swagger UI
+            var securityScheme = new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Description = "Enter 'Bearer {token}'",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
+                }
+            };
+
+
+
 
             // Configure Swagger documentation
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "3DModel API", Version = "v1" });
                 c.OperationFilter<RouteParameterOperationFilter>();
+                c.AddSecurityDefinition("Bearer", securityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            { securityScheme, new[] { "Bearer" } }
+        });
 
                 // Add XML comments to the Swagger documentation
 
@@ -140,7 +171,7 @@ namespace _3DModels
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "3DModel API V1");
-               
+
             });
 
 

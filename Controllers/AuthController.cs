@@ -1,194 +1,201 @@
-﻿using _3DModels.Models;
-using _3DModels.Services;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using _3DModels.Models;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using System.Text;
+using NuGet.Protocol.Plugins;
+using _3DModels.Services;
+using Microsoft.EntityFrameworkCore;
+
+
+
+
+
+
+
+
+
+
+
 
 namespace _3DModels.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly string _jwtSecret;
-        //private readonly AuthService _authService;
+        private readonly IConfiguration _configuration;
         private readonly ModelDbContext _context;
+        private readonly PasswordHashingService _passwordHashingService;
 
-        public AuthController(IConfiguration configuration, ModelDbContext context)
+
+
+
+
+        public AuthController(IConfiguration configuration, ModelDbContext context, PasswordHashingService passwordHashingService)
         {
-            _jwtSecret = configuration["ApplicationSettings:JWT_Secret"].ToString();
-            //_authService = authService;
+            _configuration = configuration;
             _context = context;
+            _passwordHashingService = passwordHashingService;
         }
 
-    
 
-        [HttpPost("login")]
-        public IActionResult Login(UserRegistrationModel userRegistration)
+
+
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult AuthLogin([FromBody] Login login)
         {
-            // Authenticate the user
-            var user = _context.users.SingleOrDefault(u => u.Email == userRegistration.Email);
-
-            if (user == null || user.pass != userRegistration.Pass)
+            if (login.Role == "Admin")
             {
-                return Unauthorized();
+                var Admin = _context.users
+                     .AsEnumerable() // Switch to client-side evaluation
+                     .FirstOrDefault(c => c.Email.Equals(login.EmailID, StringComparison.OrdinalIgnoreCase)
+&& _passwordHashingService.VerifyPassword(login.Password, c.pass)); // Verify hashed password
+
+
+
+
+
+                if (Admin != null)
+                {
+                    var token = GenerateToken(Admin.Email);
+                    var response = new { Message = "Login successful", Token = token };
+                    return Ok(response);
+                }
             }
 
-            // Generate and return a JWT token
-            var token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
-        }
 
-        // Helper method to generate a JWT token
-        private string GenerateJwtToken(Users user)
+
+
+
+         return BadRequest("User Not Found");
+      }
+
+
+        [HttpGet("get-all-roles")]
+        public async Task<IActionResult> GetAllRoles()
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSecret);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    //new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                    //new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role) // Include the user's role in the token claims
-                }),
-                Expires = DateTime.UtcNow.AddHours(1), // Set token expiration time as needed
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+                var distinctRoles = await _context.GetDistinctRolesAsync();
+                return Ok(distinctRoles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to retrieve roles.");
+            }
         }
 
         [HttpGet("admin-only-action")]
         [Authorize(Roles = "Admin")] // Only users with the "Admin" role can access this action
-        public IActionResult AdminOnlyAction()
+        public async Task<IActionResult> AdminOnlyAction()
         {
-            var user = HttpContext.User;
-
-            // Check if the user has the "Admin" role claim
-            if (user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin"))
+            // Ensure that the user has the required role
+            if (!User.IsInRole("Admin"))
             {
-                // User has the "Admin" role, so allow access
-
-                try
-                {
-                    // Fetch data from the database
-                    var data = _context.Models.ToList(); // Replace with your entity and data retrieval logic
-
-                    // Perform admin operations
-                    foreach (var entity in data)
-                    {
-                        // Example: Update properties of entities
-                        entity.Price += 10;
-                        entity.Title += " - " + entity.Description;
-                        entity.Quantity = 10;
-
-
-
-                        _context.Models.Remove(entity);
-                    }
-
-                    // Save changes to the database
-                    _context.SaveChanges();
-
-                    return Ok("Admin operations completed successfully.");
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to perform admin operations.");
-                }
-            }
-            else
-            {
-                // User does not have the "Admin" role, return Unauthorized status
-                return Unauthorized();
+                return Forbid(); // Return 403 Forbidden status
             }
 
+            // Your admin-only logic here
+            return Ok("Admin-only action accessed successfully.");
         }
 
-            [HttpGet("user-only-action")]
-            [Authorize(Roles = "User")] // Only users with the "User" role can access this action
-            public IActionResult UserOnlyAction()
+        [HttpGet("user-only-action")]
+        [Authorize(Roles = "User")] // Only users with the "User" role can access this action
+        public IActionResult UserOnlyAction()
+        {
+            // Ensure that the user has the required role
+            if (!User.IsInRole("User"))
             {
-                var user = HttpContext.User;
-
-                // Check if the user has the "User" role claim
-                if (user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "User"))
-                {
-                    // User has the "User" role, so allow access
-                    return Ok("This is a user-only action.");
-                }
-                else
-                {
-                    // User does not have the "User" role, return Unauthorized status
-                    return Unauthorized();
-                }
+                return Forbid(); // Return 403 Forbidden status
             }
 
-            [HttpGet("inventory-only-action")]
-            [Authorize(Roles = "Inventory")] // Only users with the "Inventory" role can access this action
-            public IActionResult InventoryOnlyAction()
+            // Your user-only logic here
+            return Ok("User-only action accessed successfully.");
+        }
+
+        [HttpGet("inventory-only-action")]
+        [Authorize(Roles = "Inventory")] // Only users with the "Inventory" role can access this action
+        public IActionResult InventoryOnlyAction()
+        {
+            // Ensure that the user has the required role
+            if (!User.IsInRole("Inventory"))
             {
-                var user = HttpContext.User;
-
-                // Check if the user has the "Inventory" role claim
-                if (user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Inventory"))
-                {
-                    // User has the "Inventory" role, so allow access
-
-                    // Example: Get the model ID from the request query or route parameters
-                    int modelId = 123; // Replace with your logic to get the model ID
-
-                    // Example: Retrieve the model from the database
-                    var model = _context.Models.FirstOrDefault(m => m.Id == modelId);
-
-                    if (model == null)
-                    {
-                        return NotFound("Model not found.");
-                    }
-
-                    // Example: Update the model
-                    model.Title = "Updated Title";
-                    model.Description = "Updated Description";
-                    // ... Update other properties as needed
-
-                    try
-                    {
-                        _context.SaveChanges();
-                        return Ok("Model updated successfully.");
-                    }
-                    catch (Exception ex)
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Failed to update model.");
-                    }
-
-                    // Example: Delete the model
-                    _context.Models.Remove(model);
-                    try
-                    {
-                        _context.SaveChanges();
-                        return Ok("Model deleted successfully.");
-                    }
-                    catch (Exception ex)
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Failed to delete model.");
-                    }
-                }
-                else
-                {
-                    // User does not have the "Inventory" role, return Unauthorized status
-                    return Unauthorized();
-                }
+                return Forbid(); // Return 403 Forbidden status
             }
 
+            // Your inventory-only logic here
+            return Ok("Inventory-only action accessed successfully.");
+        }
+        private async Task<Users> FetchUserFromDatabase(string email)
+        {
+            // Fetch user from your database based on the provided email
+            // Implement your database retrieval logic here
+            // You might use an ORM like Entity Framework or Dapper
+            // Example using Entity Framework:
+            return await _context.users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+        private bool VerifyPassword(string enteredPassword, string storedPasswordHash)
+        {
+            // In a real implementation, you would use a secure password hashing algorithm like BCrypt.
+            // For the sake of simplicity, this example uses a basic string comparison.
+            return enteredPassword == storedPasswordHash;
+        }
+    
+
+
+    // ... Existing code for token generation and key generation ...   
+    private string GenerateToken(string userEmail)
+        {
+            var jwtSecret = GenerateJwtSecretKey();
+
+
+
+
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim("Email", userEmail)
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(5),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
+
+
+
+
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            var token = tokenHandler.WriteToken(securityToken);
+            return token;
+        }
+
+
+
+
+
+        private string GenerateJwtSecretKey()
+        {
+            var randomBytes = new byte[32]; // 256 bits
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return Convert.ToBase64String(randomBytes);
         }
     }
-
+}

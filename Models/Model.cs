@@ -35,10 +35,16 @@ namespace _3DModels.Models
         public int InventoryItemId { get; set; }
 
         
-        public InventoryItem InventoryItem { get; set; }
+       // public InventoryItem InventoryItem { get; set; }
 
 
 
     }
 
 }
+
+
+
+
+
+

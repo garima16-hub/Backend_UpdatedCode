@@ -14,10 +14,7 @@ namespace _3DModels.Repositories
             _context = context;
         }
 
-        public IEnumerable<Users> GetAllUsers()
-        {
-            return _context.users.ToList();
-        }
+        
 
         public Users GetUserById(int id)
         {

@@ -5,6 +5,8 @@ namespace _3DModels.Repository
 {
     public interface IModel
     {
+
+        public List<Model> GetAllModels();
         List<Model> GetModels(string category, string subcategory, int count);
 
         Model GetModel(int id);
